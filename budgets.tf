@@ -10,7 +10,7 @@ resource "aws_budgets_budget" "monthly_budget" {
     threshold                  = 5
     threshold_type             = "ABSOLUTE_VALUE"
     notification_type          = "ACTUAL"
-    subscriber_email_addresses = ["tech@honahuku.com"]
+    subscriber_email_addresses = [var.notification_email]
     subscriber_sns_topic_arns  = [aws_sns_topic.budget_alerts.arn]
   }
 }
@@ -22,5 +22,5 @@ resource "aws_sns_topic" "budget_alerts" {
 resource "aws_sns_topic_subscription" "email_subscription_yamakawa" {
   topic_arn = aws_sns_topic.budget_alerts.arn
   protocol  = "email"
-  endpoint  = "tech@honahuku.com"
+  endpoint  = var.notification_email
 }
