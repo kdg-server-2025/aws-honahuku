@@ -38,6 +38,5 @@ resource "aws_instance" "kdg-aws-20250621" {
 
   vpc_security_group_ids = [aws_security_group.ssh_enable.id]
 
-  user_data_replace_on_change = true
   key_name                    = aws_key_pair.honahuku_thinkpad_20250621.id
 }
