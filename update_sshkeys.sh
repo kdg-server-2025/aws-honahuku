@@ -4,7 +4,7 @@ set -o pipefail
 
 # GitHub に登録した公開鍵をダウンロードする
 GITHUB_USERNAME=honahuku
-if ! wget --tries=50 --waitretry=10 --connect-timeout=10 -O authorized_keys https://github.com/$GITHUB_USERNAME.keys
+if wget --tries=50 --waitretry=10 --connect-timeout=10 -O authorized_keys https://github.com/$GITHUB_USERNAME.keys
 then
   # SSH の公開鍵を配置する
   mkdir -p /home/ubuntu/.ssh/
