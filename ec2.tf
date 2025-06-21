@@ -15,28 +15,29 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_instance" "kdg-aws-20250621-user-date-enable" {
+variable "ssh_key" {
+  description = "EC2 で使う SSH Key"
+  type        = string
+}
+
+# key 名は任意の名前で良い。GitHub の key と同じように作業しているPCの名前がおすすめ
+resource "aws_key_pair" "honahuku_thinkpad_20250621" {
+  key_name   = "honahuku-thinkpad-20250621"
+  public_key = var.ssh_key
+}
+
+resource "aws_instance" "kdg-aws-20250621" {
   ami = data.aws_ami.ubuntu.id
   # AWS の無力枠を使いたいため t3.micro を使う
   instance_type = "t3.micro"
 
   tags = {
-    Name     = "kdg-aws-20250621-user-date-enable",
+    Name     = "kdg-aws-20250621",
     UserDate = "true"
   }
 
   vpc_security_group_ids = [aws_security_group.ssh_enable.id]
 
   user_data_replace_on_change = true
-  user_data_base64            = <<EOF
-IyEvdXNyL2Jpbi9lbnYgYmFzaApzZXQgLUNldXgKc2V0IC1vIHBpcGVmYWlsCgojIEdpdEh1YiDj
-gavnmbvpjLLjgZfjgZ/lhazplovpjbXjgpLjg4Djgqbjg7Pjg63jg7zjg4njgZnjgosKR0lUSFVC
-X1VTRVJOQU1FPSJob25haHVrdSIKaWYgISB3Z2V0IC0tdHJpZXM9NTAgLS13YWl0cmV0cnk9MTAg
-LS1jb25uZWN0LXRpbWVvdXQ9MTAgLU8gYXV0aG9yaXplZF9rZXlzIGh0dHBzOi8vZ2l0aHViLmNv
-bS8ke0dJVEhVQl9VU0VSTkFNRX0ua2V5cwp0aGVuCiAgIyBTU0gg44Gu5YWs6ZaL6Y2144KS6YWN
-572u44GZ44KLCiAgbWtkaXIgLXAgfi8uc3NoLwogIG12IGF1dGhvcml6ZWRfa2V5cyB+Ly5zc2gv
-CgogICMgc3NoZCDjgYzkvb/jgYjjgovjgojjgYbjgavjgZnjgovjgZ/jgoHjgavpjbXjga7jg5Hj
-g7zjg5/jg4Pjgrfjg6fjg7PjgpLlpInmm7TjgZnjgosKICBjaG1vZCA2MDAgIH4vLnNzaC9hdXRo
-b3JpemVkX2tleXMKICBleGl0IDAKZWxzZQogIGV4aXQgMQpmaQo=
-EOF
+  key_name                    = aws_key_pair.honahuku_thinkpad_20250621.id
 }
