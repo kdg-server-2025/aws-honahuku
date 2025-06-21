@@ -38,5 +38,5 @@ resource "aws_instance" "kdg-aws-20250621" {
 
   vpc_security_group_ids = [aws_security_group.ssh_enable.id]
 
-  key_name                    = aws_key_pair.honahuku_thinkpad_20250621.id
+  key_name = aws_key_pair.honahuku_thinkpad_20250621.id
 }
