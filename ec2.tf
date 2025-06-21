@@ -15,18 +15,19 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_instance" "kdg-aws-20250621" {
-  ami = data.aws_ami.ubuntu.id
-  # AWS の無力枠を使いたいため t3.micro を使う
-  instance_type = "t3.micro"
+# 課金が発生するためコメントアウト
+# resource "aws_instance" "kdg-aws-20250621" {
+#   ami = data.aws_ami.ubuntu.id
+#   # AWS の無力枠を使いたいため t3.micro を使う
+#   instance_type = "t3.micro"
 
-  tags = {
-    Name     = "kdg-aws-20250621",
-    UserDate = "true"
-  }
+#   tags = {
+#     Name     = "kdg-aws-20250621",
+#     UserDate = "true"
+#   }
 
-  vpc_security_group_ids = [aws_security_group.ssh_enable.id]
+#   vpc_security_group_ids = [aws_security_group.ssh_enable.id]
 
-  user_data_replace_on_change = true
-  user_data                   = file("./update_sshkeys.sh")
-}
+#   user_data_replace_on_change = true
+#   user_data                   = file("./update_sshkeys.sh")
+# }
