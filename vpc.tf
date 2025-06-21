@@ -15,7 +15,20 @@ resource "aws_security_group" "ssh_enable" {
   }
 }
 
-resource "aws_vpc_security_group_egress_rule" "ssh_enable" {
+resource "aws_vpc_security_group_egress_rule" "any" {
+  security_group_id = aws_security_group.ssh_enable.id
+
+  cidr_ipv4 = "0.0.0.0/0"
+  # any
+  ip_protocol = "-1"
+
+  tags = {
+    Name = "any",
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ssh_enable" {
+
   security_group_id = aws_security_group.ssh_enable.id
 
   cidr_ipv4   = "0.0.0.0/0"
@@ -25,17 +38,5 @@ resource "aws_vpc_security_group_egress_rule" "ssh_enable" {
 
   tags = {
     Name = "ssh-enable",
-  }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "any" {
-  security_group_id = aws_security_group.ssh_enable.id
-
-  cidr_ipv4 = "0.0.0.0/0"
-  # any
-  ip_protocol = "-1"
-
-  tags = {
-    Name = "any",
   }
 }
