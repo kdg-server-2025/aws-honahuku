@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -34,11 +35,11 @@ func callLambda() (string, error) {
 
 // レスポンスボディの構造を定義
 type ResponseBody struct {
-	Message         string      `json:"message"`
-	CurrentTime     string      `json:"currentTime"`
-	LambdaUsage     interface{} `json:"lambdaUsage"`
-	EnvironmentVars []string    `json:"environmentVars"`
-	LambdaContext   interface{} `json:"lambdaContext"`
+	Message         string            `json:"message"`
+	CurrentTime     string            `json:"currentTime"`
+	LambdaUsage     interface{}       `json:"lambdaUsage"`
+	EnvironmentVars map[string]string `json:"environmentVars"`
+	LambdaContext   interface{}       `json:"lambdaContext"`
 }
 
 // HTTPリクエストを処理するハンドラ関数
@@ -63,13 +64,34 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	var usageJson interface{}
 	json.Unmarshal([]byte(usageStr), &usageJson)
+	// environmentVars にはパブリックにしないほうが良い情報が含まれているので公開を許可する環境変数のリストを定義
+	allowedEnvKeys := map[string]bool{
+		"AWS_LAMBDA_FUNCTION_NAME":        true,
+		"AWS_LAMBDA_INITIALIZATION_TYPE":  true,
+		"AWS_REGION":                      true,
+		"AWS_LAMBDA_FUNCTION_MEMORY_SIZE": true,
+	}
+
+	// 環境変数をフィルタリングして、許可されたものだけをマップに格納
+	filteredEnvVars := make(map[string]string)
+	for _, env := range os.Environ() {
+		// "KEY=VALUE" の形式の文字列をキーと値に分割
+		pair := strings.SplitN(env, "=", 2)
+		if len(pair) == 2 {
+			key := pair[0]
+			// キーがリストに含まれているかチェック
+			if allowedEnvKeys[key] {
+				filteredEnvVars[key] = pair[1]
+			}
+		}
+	}
 
 	// レスポンスボディを作成
 	responseBody := ResponseBody{
 		Message:         "Successfully processed request!",
 		CurrentTime:     time.Now().Format(time.RFC3339),
 		LambdaUsage:     usageJson,
-		EnvironmentVars: os.Environ(),
+		EnvironmentVars: filteredEnvVars,
 		LambdaContext:   lc,
 	}
 
