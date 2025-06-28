@@ -48,6 +48,16 @@ resource "aws_iam_role_policy" "get_account_settings" {
   })
 }
 
+# 初回のみ利用する空のLambdaのファイルを生成
+data "archive_file" "initial_lambda_package" {
+  type        = "zip"
+  output_path = "${path.module}/.temp_files/lambda.zip"
+  source {
+    content  = "# empty"
+    filename = "hoge.txt"
+  }
+}
+
 # (初回のみ)空のLambdaのファイルをS3にアップロード
 resource "aws_s3_object" "lambda_file" {
   bucket = aws_s3_bucket.lambda_artifacts.id
