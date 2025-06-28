@@ -3,49 +3,90 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"os"
+	"time"
+
 	"github.com/aws/aws-lambda-go/events"
 	runtime "github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-lambda-go/lambdacontext"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
-	"log"
-	"os"
 )
 
+// Lambdaサービスクライアントを初期化
 var client = lambda.New(session.New())
 
+// AWS SDKを呼び出し、アカウントの情報を取得する
 func callLambda() (string, error) {
 	input := &lambda.GetAccountSettingsInput{}
 	req, resp := client.GetAccountSettingsRequest(input)
 	err := req.Send()
-	output, _ := json.Marshal(resp.AccountUsage)
-	return string(output), err
+	if err != nil {
+		return "", err
+	}
+	output, err := json.Marshal(resp.AccountUsage)
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
 }
 
-func handleRequest(ctx context.Context, event events.SQSEvent) (string, error) {
-	// event
-	eventJson, _ := json.MarshalIndent(event, "", "  ")
-	log.Printf("EVENT: %s", eventJson)
-	// environment variables
-	log.Printf("REGION: %s", os.Getenv("AWS_REGION"))
-	log.Println("ALL ENV VARS:")
-	for _, element := range os.Environ() {
-		log.Println(element)
-	}
-	// request context
+// レスポンスボディの構造を定義
+type ResponseBody struct {
+	Message         string      `json:"message"`
+	CurrentTime     string      `json:"currentTime"`
+	LambdaUsage     interface{} `json:"lambdaUsage"`
+	EnvironmentVars []string    `json:"environmentVars"`
+	LambdaContext   interface{} `json:"lambdaContext"`
+}
+
+// HTTPリクエストを処理するハンドラ関数
+// 引数と戻り値をAPIGatewayProxyの型に変更
+func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	requestJson, _ := json.MarshalIndent(request, "", "  ")
+	log.Printf("REQUEST: %s", requestJson)
+
 	lc, _ := lambdacontext.FromContext(ctx)
 	log.Printf("REQUEST ID: %s", lc.AwsRequestID)
-	// global variable
-	log.Printf("FUNCTION NAME: %s", lambdacontext.FunctionName)
-	// context method
-	deadline, _ := ctx.Deadline()
-	log.Printf("DEADLINE: %s", deadline)
-	// AWS SDK call
-	usage, err := callLambda()
+
+	// AWS SDKを呼び出し
+	usageStr, err := callLambda()
 	if err != nil {
-		return "ERROR", err
+		log.Printf("Error calling AWS SDK: %v", err)
+		// エラーが発生したら500を返す
+		return events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       "Error getting Lambda account usage.",
+		}, err
 	}
-	return usage, nil
+
+	var usageJson interface{}
+	json.Unmarshal([]byte(usageStr), &usageJson)
+
+	// レスポンスボディを作成
+	responseBody := ResponseBody{
+		Message:         "Successfully processed request!",
+		CurrentTime:     time.Now().Format(time.RFC3339),
+		LambdaUsage:     usageJson,
+		EnvironmentVars: os.Environ(),
+		LambdaContext:   lc,
+	}
+
+	// レスポンスボディをJSON文字列に変換
+	responseJson, err := json.Marshal(responseBody)
+	if err != nil {
+		return events.APIGatewayProxyResponse{StatusCode: 500}, err
+	}
+
+	// 正常なレスポンスを返す
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+		},
+		Body: string(responseJson),
+	}, nil
 }
 
 func main() {
