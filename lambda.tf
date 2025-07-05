@@ -1,12 +1,15 @@
 # CI/CD側でlambdaのソースコードを格納するための箱
 resource "aws_s3_bucket" "lambda_artifacts" {
+  # AWS S3 で一意である(重複がない)必要がある
+  # 例) kdg-aws-2025-ここに自分のgithubのユーザー名-lambda-artifacts
   bucket = "kdg-aws-2025-honahuku-lambda-artifacts"
   tags = {
+    # bucket に指定した内容と同じものを書く
     Name = "kdg-aws-2025-honahuku-lambda-artifacts"
   }
 }
 
-# ロールを生成
+# ロールを定義
 resource "aws_iam_role" "lambda" {
   name = "iam_for_lambda"
 
