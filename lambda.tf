@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "lambda_artifacts" {
   }
 }
 
-# ロールを定義
+# lambda 実行時に必要な権限をまとめる role を定義する
 resource "aws_iam_role" "lambda" {
   name = "iam_for_lambda"
 
@@ -28,13 +28,13 @@ resource "aws_iam_role" "lambda" {
   })
 }
 
-# CloudWatch Logsへの書き込み権限を付与
+# CloudWatch Logs への書き込み権限を 定義した role に対して付与する
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
   role       = aws_iam_role.lambda.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# GetAccountSettings の権限をインラインポリシーとして付与
+# GetAccountSettings も実行時に必要な権限なので付与する
 resource "aws_iam_role_policy" "get_account_settings" {
   name = "GetAccountSettingsPermission"
   role = aws_iam_role.lambda.id
