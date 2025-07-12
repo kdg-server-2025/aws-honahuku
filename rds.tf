@@ -27,12 +27,13 @@ resource "aws_db_instance" "kdg_database" {
   # 無料枠で収めるため今回は可用性の低い設定を許容する
   multi_az = false
 
-  # ログイン時の認証情報
+  # DB への接続に必要な情報
   username = "postgres"
   password = var.rds_password
-}
+  port     = 5432
+  #   5432 へのアクセスを許可するような security group を作成して指定する
+  vpc_security_group_ids = [aws_security_group.rds_enable.id]
 
-import {
-  to = aws_db_instance.kdg_database
-  id = "kdg-database"
+  # セキュリティ関連
+  ca_cert_identifier = "rds-ca-rsa4096-g1"
 }
