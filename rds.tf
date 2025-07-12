@@ -33,6 +33,7 @@ resource "aws_db_instance" "kdg_database" {
   port     = 5432
   #   5432 へのアクセスを許可するような security group を作成して指定する
   vpc_security_group_ids = [aws_security_group.rds_enable.id]
+  publicly_accessible    = true
 
   # セキュリティ関連
   ca_cert_identifier = "rds-ca-rsa4096-g1"
