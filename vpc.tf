@@ -15,28 +15,32 @@ resource "aws_security_group" "ssh_enable" {
   }
 }
 
-resource "aws_vpc_security_group_egress_rule" "any" {
-  security_group_id = aws_security_group.ssh_enable.id
-
-  cidr_ipv4 = "0.0.0.0/0"
-  # any
-  ip_protocol = "-1"
-
-  tags = {
-    Name = "any",
-  }
-}
-
+# インバウンドルール
 resource "aws_vpc_security_group_ingress_rule" "ssh_enable" {
 
   security_group_id = aws_security_group.ssh_enable.id
 
-  cidr_ipv4   = "0.0.0.0/0"
+  # 不正アクセス等の懸念があるため既知のIPからのみアクセスを許可する
+  cidr_ipv4   = "159.28.73.109/32" # バンタンのIP
   from_port   = 22
   ip_protocol = "tcp"
   to_port     = 22
 
   tags = {
     Name = "ssh-enable",
+  }
+}
+
+# アウトバウンドルール
+resource "aws_vpc_security_group_egress_rule" "ssh_enable_any" {
+  security_group_id = aws_security_group.ssh_enable.id
+
+  # 不正アクセス等の懸念があるため既知のIPからのみアクセスを許可する
+  cidr_ipv4 = "159.28.73.109/32" # バンタンのIP
+  # any
+  ip_protocol = "-1"
+
+  tags = {
+    Name = "any",
   }
 }
