@@ -18,7 +18,7 @@ resource "aws_db_instance" "kdg_database" {
   storage_type      = "gp2"
 
   # 追加の費用が掛かることを防止するため snapshot と Performance Insights は無効にする
-  skip_final_snapshot          = false
+  skip_final_snapshot          = true
   copy_tags_to_snapshot        = false
   storage_encrypted            = false
   performance_insights_enabled = false
