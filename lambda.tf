@@ -1,13 +1,13 @@
-# CI/CD側でlambdaのソースコードを格納するための箱
-resource "aws_s3_bucket" "lambda_artifacts" {
-  # AWS S3 で一意である(重複がない)必要がある
-  # 例) kdg-aws-2025-ここに自分のgithubのユーザー名-lambda-artifacts
-  bucket = "kdg-aws-2025-honahuku-lambda-artifacts"
-  tags = {
-    # bucket に指定した内容と同じものを書く
-    Name = "kdg-aws-2025-honahuku-lambda-artifacts"
-  }
-}
+# # CI/CD側でlambdaのソースコードを格納するための箱
+# resource "aws_s3_bucket" "lambda_artifacts" {
+#   # AWS S3 で一意である(重複がない)必要がある
+#   # 例) kdg-aws-2025-ここに自分のgithubのユーザー名-lambda-artifacts
+#   bucket = "kdg-aws-2025-honahuku-lambda-artifacts"
+#   tags = {
+#     # bucket に指定した内容と同じものを書く
+#     Name = "kdg-aws-2025-honahuku-lambda-artifacts"
+#   }
+# }
 
 # lambda 実行時に必要な権限をまとめる role を定義する
 resource "aws_iam_role" "lambda" {
@@ -61,27 +61,27 @@ data "archive_file" "initial_lambda_package" {
   }
 }
 
-# (初回のみ)空のLambdaのファイルをS3にアップロード
-resource "aws_s3_object" "lambda_file" {
-  bucket = aws_s3_bucket.lambda_artifacts.id
-  key    = "initial.zip"
-  source = "${path.module}/.temp_files/lambda.zip"
-}
+# # (初回のみ)空のLambdaのファイルをS3にアップロード
+# resource "aws_s3_object" "lambda_file" {
+#   bucket = aws_s3_bucket.lambda_artifacts.id
+#   key    = "initial.zip"
+#   source = "${path.module}/.temp_files/lambda.zip"
+# }
 
-# Lambda関数を生成
-resource "aws_lambda_function" "first_function" {
-  function_name = "first-function"
-  role          = aws_iam_role.lambda.arn
-  handler       = "main.handler"
-  runtime       = "provided.al2023"
-  timeout       = 120
-  publish       = true
-  s3_bucket     = aws_s3_bucket.lambda_artifacts.id
-  s3_key        = aws_s3_object.lambda_file.key
-}
+# # Lambda関数を生成
+# resource "aws_lambda_function" "first_function" {
+#   function_name = "first-function"
+#   role          = aws_iam_role.lambda.arn
+#   handler       = "main.handler"
+#   runtime       = "provided.al2023"
+#   timeout       = 120
+#   publish       = true
+#   s3_bucket     = aws_s3_bucket.lambda_artifacts.id
+#   s3_key        = aws_s3_object.lambda_file.key
+# }
 
-# 外部からリクエストを飛ばすためのエンドポイント
-resource "aws_lambda_function_url" "first_function" {
-  function_name      = aws_lambda_function.first_function.function_name
-  authorization_type = "NONE"
-}
+# # 外部からリクエストを飛ばすためのエンドポイント
+# resource "aws_lambda_function_url" "first_function" {
+#   function_name      = aws_lambda_function.first_function.function_name
+#   authorization_type = "NONE"
+# }
