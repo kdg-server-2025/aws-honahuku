@@ -1,4 +1,0 @@
-# このファイルをコピーし terraform.tfvars という名前で保存することで使えるようになります
-notification_email = "test@example.com"
-vpc_id             = "vpc-00000000000000000"
-rds_password       = "hogehoge(各自でパスワードを生成しここの値を埋めてください)"

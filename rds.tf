@@ -37,3 +37,9 @@ resource "aws_db_instance" "kdg_database" {
   # セキュリティ関連
   ca_cert_identifier = "rds-ca-rsa4096-g1"
 }
+
+# RDSのエンドポイントを出力するoutputブロック
+output "rds_endpoint" {
+  description = "RDS のエンドポイント"
+  value       = aws_db_instance.kdg_database.address
+}
