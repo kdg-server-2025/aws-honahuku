@@ -17,10 +17,11 @@ resource "aws_db_instance" "kdg_database" {
   allocated_storage = 20
   storage_type      = "gp2"
 
-  # 追加の費用が掛かることを防止するため snapshot は無効にする
-  skip_final_snapshot   = false
-  copy_tags_to_snapshot = false
-  storage_encrypted     = false
+  # 追加の費用が掛かることを防止するため snapshot と Performance Insights は無効にする
+  skip_final_snapshot          = false
+  copy_tags_to_snapshot        = false
+  storage_encrypted            = false
+  performance_insights_enabled = false
 
   # 可用性関連の設定
   # 無料枠で収めるため今回は可用性の低い設定を許容する
