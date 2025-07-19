@@ -24,7 +24,12 @@ resource "aws_sns_topic" "budget_alerts" {
   name = "budget-alerts"
 }
 
-resource "aws_sns_topic_subscription" "email_subscription_yamakawa" {
+moved {
+  from = aws_sns_topic_subscription.email_subscription_yamakawa
+  to = aws_sns_topic_subscription.budget
+}
+
+resource "aws_sns_topic_subscription" "budget" {
   topic_arn = aws_sns_topic.budget_alerts.arn
   protocol  = "email"
   endpoint  = var.notification_email
