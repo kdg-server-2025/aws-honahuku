@@ -94,3 +94,8 @@ resource "aws_lambda_function_url" "kdg_lamda_sample" {
   authorization_type = "NONE"
 }
 
+# Lambda関数のURLをアウトプットする
+output "lambda_kdg_lamda_sample_url" {
+  description = "デプロイした first_function の URL"
+  value       = aws_lambda_function_url.kdg_lamda_sample.function_url
+}
