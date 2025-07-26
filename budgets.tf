@@ -29,3 +29,8 @@ resource "aws_sns_topic_subscription" "email_subscription_yamakawa" {
   protocol  = "email"
   endpoint  = var.notification_email
 }
+
+output "sns_topic_budget_arn" {
+  description = "email で topic の conform をするときに確認する用。topic の ARN が表示される"
+  value       = aws_sns_topic.budget_alerts.arn
+}
