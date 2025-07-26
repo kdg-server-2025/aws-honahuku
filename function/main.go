@@ -101,9 +101,9 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return events.APIGatewayProxyResponse{StatusCode: 500}, err
 	}
 
-	// レスポンスを返す
+	// 正常なレスポンスを返す
 	return events.APIGatewayProxyResponse{
-		StatusCode: 400,
+		StatusCode: 200,
 		Headers: map[string]string{
 			"Content-Type": "application/json",
 		},
