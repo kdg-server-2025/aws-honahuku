@@ -33,7 +33,10 @@ resource "aws_db_instance" "kdg_database" {
   port     = 5432
   #   5432 へのアクセスを許可するような security group を作成して指定する
   vpc_security_group_ids = [aws_security_group.rds_enable.id]
-  publicly_accessible    = true
+  # 一般公開するような web アプリケーションで使うなら絶対に false にしたほうが良い
+  # RDS Proxy と Lambda を使った接続などを併用し接続することが望ましいが、今回の授業で扱うには複雑な厚生となってしまうため、エンドポイントを公開しそこにアクセスする。
+  # 代わりに使い終わったらすぐに RDS インスタンスを削除する(不正利用等を防ぐため)
+  publicly_accessible = true
 
   # セキュリティ関連
   ca_cert_identifier = "rds-ca-rsa4096-g1"
