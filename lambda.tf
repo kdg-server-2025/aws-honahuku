@@ -1,4 +1,4 @@
-# # CI/CD側でlambdaのソースコードを格納するための箱
+# CI/CD側でlambdaのソースコードを格納するための箱
 resource "aws_s3_bucket" "lambda_artifacts" {
   # AWS S3 で一意である(重複がない)必要がある
   # 例) kdg-aws-2025-ここに自分のgithubのユーザー名-lambda-artifacts
@@ -68,9 +68,13 @@ resource "aws_s3_object" "lambda_file" {
   source = "${path.module}/.temp_files/lambda.zip"
 }
 
+moved {
+  from = aws_lambda_function.first_function
+  to   = aws_lambda_function.kdg_lamda_sample
+}
 # Lambda関数を生成
-resource "aws_lambda_function" "first_function" {
-  function_name = "first-function"
+resource "aws_lambda_function" "kdg_lamda_sample" {
+  function_name = "kdg-lamda-sample"
   role          = aws_iam_role.lambda.arn
   handler       = "main.handler"
   runtime       = "provided.al2023"
@@ -80,8 +84,18 @@ resource "aws_lambda_function" "first_function" {
   s3_key        = aws_s3_object.lambda_file.key
 }
 
+moved {
+  from = aws_lambda_function_url.first_function
+  to   = aws_lambda_function_url.kdg_lamda_sample
+}
 # 外部からリクエストを飛ばすためのエンドポイント
-resource "aws_lambda_function_url" "first_function" {
-  function_name      = aws_lambda_function.first_function.function_name
+resource "aws_lambda_function_url" "kdg_lamda_sample" {
+  function_name      = aws_lambda_function.kdg_lamda_sample.function_name
   authorization_type = "NONE"
+}
+
+# Lambda関数のURLをアウトプットする
+output "lambda_kdg_lamda_sample_url" {
+  description = "デプロイした first_function の URL"
+  value       = aws_lambda_function_url.kdg_lamda_sample.function_url
 }
