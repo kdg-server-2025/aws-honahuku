@@ -68,10 +68,6 @@ resource "aws_s3_object" "lambda_file" {
   source = "${path.module}/.temp_files/lambda.zip"
 }
 
-moved {
-  from = aws_lambda_function.first_function
-  to   = aws_lambda_function.kdg_lamda_sample
-}
 # Lambda関数を生成
 resource "aws_lambda_function" "kdg_lamda_sample" {
   function_name = "kdg-lamda-sample"
@@ -84,10 +80,6 @@ resource "aws_lambda_function" "kdg_lamda_sample" {
   s3_key        = aws_s3_object.lambda_file.key
 }
 
-moved {
-  from = aws_lambda_function_url.first_function
-  to   = aws_lambda_function_url.kdg_lamda_sample
-}
 # 外部からリクエストを飛ばすためのエンドポイント
 resource "aws_lambda_function_url" "kdg_lamda_sample" {
   function_name      = aws_lambda_function.kdg_lamda_sample.function_name
