@@ -36,6 +36,8 @@ resource "aws_db_instance" "kdg_database" {
   # 一般公開するような web アプリケーションで使うなら絶対に false にしたほうが良い
   # RDS Proxy と Lambda を使った接続などを併用し接続することが望ましいが、今回の授業で扱うには複雑な厚生となってしまうため、エンドポイントを公開しそこにアクセスする。
   # 代わりに使い終わったらすぐに RDS インスタンスを削除する(不正利用等を防ぐため)
+  # RDS Proxyについて ➔ https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html
+  # RDS への Lambda を使った接続について ➔ https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/lambda-rds-connect.html
   publicly_accessible = true
 
   # セキュリティ関連
